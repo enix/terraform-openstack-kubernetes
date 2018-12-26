@@ -1,0 +1,8 @@
+version: '3'
+services:
+  loadbalancer:
+    image: enix/kubernetes-api-loadbalancer:master
+    network_mode: host
+    restart: always
+    environment:
+      K8S_MASTERS_IPS: "${K8S_MASTERS_IPS}"

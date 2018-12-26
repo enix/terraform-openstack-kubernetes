@@ -1,0 +1,15 @@
+apiVersion: "kubeadm.k8s.io/v1alpha3"
+kind: ClusterConfiguration
+etcd:
+    local:
+        serverCertSANs:
+        - "${ETCD_PEER_NAME}"
+        - "${ETCD_PEER_IP}"
+        peerCertSANs:
+        - "${ETCD_PEER_NAME}"
+        - "${ETCD_PEER_IP}"
+        extraArgs:
+            name: ${ETCD_PEER_NAME}
+            listen-peer-urls: https://${ETCD_PEER_IP}:2380
+            listen-client-urls: https://${ETCD_PEER_IP}:2379
+            advertise-client-urls: https://${ETCD_PEER_IP}:2379

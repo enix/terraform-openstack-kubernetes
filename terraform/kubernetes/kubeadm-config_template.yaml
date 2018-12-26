@@ -1,0 +1,42 @@
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: ${K8S_VERSION}
+controlPlaneEndpoint: ${K8S_CONTROLPLANE_ENDPOINT}
+etcd:
+  external:
+    endpoints: ${ETCD_EXTERNAL_ENDPOINTS}
+    caFile: /etc/kubernetes/pki/etcd/ca.crt
+    certFile: /etc/kubernetes/pki/apiserver-etcd-client.crt
+    keyFile: /etc/kubernetes/pki/apiserver-etcd-client.key
+networking:
+    dnsDomain: ${K8S_DOMAIN}
+    podSubnet: ${K8S_POD_SUBNET}
+    serviceSubnet: ${K8S_SERVICE_SUBNET}
+controllerManager:
+  extraArgs:
+    cloud-provider: external
+apiServer:
+  certSANs: ${K8S_API_SANS}
+  extraArgs:
+    bind-address: ${K8S_INTERNAL_ADDRESS}
+    advertise-address: ${K8S_INTERNAL_ADDRESS}
+---
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: InitConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    node-ip: ${K8S_INTERNAL_ADDRESS}
+    cloud-provider: external
+---
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: JoinConfiguration
+nodeRegistration:
+  kubeletExtraArgs:
+    node-ip: ${K8S_INTERNAL_ADDRESS}
+    cloud-provider: external
+# apiVersion: kubelet.config.k8s.io/v1beta1
+# kind: KubeletConfiguration
+
+# apiVersion: kubeproxy.config.k8s.io/v1alpha1
+# kind: KubeProxyConfiguration
+

@@ -1,0 +1,28 @@
+apiVersion: v1
+data:
+  config.conf: |
+    # this dummy configmap is necessary to make kubeadm join work in a kube-proxy less cluster
+kind: ConfigMap
+metadata:
+  name: kube-proxy
+  namespace: kube-system
+  creationTimestamp: null
+  selfLink: /api/v1/namespaces/kube-system/configmaps/kube-proxy
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  creationTimestamp: "2018-12-05T18:24:12Z"
+  name: kubeadm:nodes-kubeadm-config
+  namespace: kube-system
+  selfLink: /apis/rbac.authorization.k8s.io/v1/namespaces/kube-system/roles/kubeadm%3Anodes-kubeadm-config
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - kubeadm-config
+  - kube-proxy
+  resources:
+  - configmaps
+  verbs:
+  - get

@@ -1,0 +1,48 @@
+#cloud-config
+
+resolv_conf:
+  nameservers: ['1.1.1.1', '8.8.8.8']
+
+apt:
+  sources:
+    docker:
+      keyid: "0EBFCD88"
+      source: "deb https://download.docker.com/linux/ubuntu bionic stable"
+    kubernetes:
+      keyid: "BA07F4FB"
+      source: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+
+packages:
+  - [docker-ce, ${DOCKER_VERSION}]
+  - [kubectl, ${KUBERNETES_VERSION}]
+  - [kubeadm, ${KUBERNETES_VERSION}]
+  - [kubelet, ${KUBERNETES_VERSION}]
+  - jq
+  - tcpdump
+  - ipvsadm
+
+# write_files:
+#   - path: /etc/modules-load.d/ip_vs.conf
+#     content: |
+#       ip_vs
+#       ip_vs_rr
+#       ip_vs_wrr
+#       ip_vs_sh
+
+bootcmd:
+  - [ sh, -c, "sudo curl -L \"https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose"]
+  - [ sh, -c, "sudo curl -L \"https://github.com/wercker/stern/releases/download/${STERN_VERSION}/stern_linux_amd64\" -o /usr/local/bin/stern"]
+  - [ sh, -c, "sudo chmod +x /usr/local/bin/*"]
+
+groups:
+  - docker 
+
+manage_etc_hosts: true
+
+system_info:
+  default_user:
+    groups: [adm, audio, cdrom, dialout, dip, floppy, lxd, netdev, plugdev, sudo, video, docker]
+
+ntp:
+  enabled: true
+  ntp_client: chrony 

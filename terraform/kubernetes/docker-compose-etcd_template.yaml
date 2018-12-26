@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  etcd:
+    image: gcr.io/etcd-development/etcd:${ETCD_VERSION}
+    network_mode: host
+    restart: always
+    healthcheck:
+      test: "ETCDCTL_API=3 etcdctl --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/healthcheck-client.crt --key=/etc/kubernetes/pki/etcd/healthcheck-client.key get foo"
+      interval: 1m
+      timeout: 15s
+      retries: 8
+      start_period: 15s
+    volumes:
+      - /etc/kubernetes/pki/etcd:/etc/kubernetes/pki/etcd
+      - /var/lib/etcd:/var/lib/etcd
+    command: ["etcd",
+      "--initial-advertise-peer-urls=https://${ETCD_PEER_IP}:2380",
+      "--listen-peer-urls=https://${ETCD_PEER_IP}:2380",
+      "--listen-client-urls=https://${ETCD_PEER_IP}:2379,https://127.0.0.1:2379",
+      "--advertise-client-urls=https://${ETCD_PEER_IP}:2379",
+      "--initial-cluster-token=${ETCD_INITIAL_CLUSTER_TOKEN}",
+      "--initial-cluster=${ETCD_INITIAL_CLUSTER}",
+      "--initial-cluster-state=${ETCD_INITIAL_CLUSTER_STATE}",
+      "--cert-file=/etc/kubernetes/pki/etcd/server.crt",
+      "--client-cert-auth=true",
+      "--data-dir=/var/lib/etcd",
+      "--key-file=/etc/kubernetes/pki/etcd/server.key",
+      "--name=${ETCD_PEER_NAME}",
+      "--peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt",
+      "--peer-client-cert-auth=true",
+      "--peer-key-file=/etc/kubernetes/pki/etcd/peer.key",
+      "--peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt",
+      "--snapshot-count=10000",
+      "--trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt"]
